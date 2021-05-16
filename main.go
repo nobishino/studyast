@@ -14,17 +14,14 @@ import (
 //go:embed main.go
 var src string
 
-type MyInt int
-type MyMyInt MyInt
-type AliasInt = int
-type IntSlice []int
-
 func main() {
+	// main.go 自身を読み込んでAST(*ast.File)を作る
 	fset := token.NewFileSet()
 	file, err := parser.ParseFile(fset, "main.go", src, 0)
 	if err != nil {
 		log.Fatal(err)
 	}
+	// ASTに対して型チェックを行う
 	cfg := &types.Config{Importer: importer.Default()}
 	info := &types.Info{
 		Defs: map[*ast.Ident]types.Object{},
@@ -33,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// 与えられた型名に対して、「underlying typeが自分自身かどうか」をチェックする関数
 	underlyingIsItself := func(typeName string) {
 		tp := pkg.Scope().Lookup(typeName)
 		if tp == nil {
@@ -42,9 +40,13 @@ func main() {
 		result := tp.Type() == tp.Type().Underlying()
 		fmt.Printf("%[1]sのunderlying typeは%[1]s? -> %t\n", typeName, result)
 	}
-	ast.Print(fset, file)
-	underlyingIsItself("MyInt")
-	underlyingIsItself("MyMyInt")
-	underlyingIsItself("AliasInt")
-	underlyingIsItself("IntSlice")
+	underlyingIsItself("MyInt")    // MyIntのunderlying typeはMyInt? -> false
+	underlyingIsItself("MyMyInt")  // MyMyIntのunderlying typeはMyMyInt? -> false
+	underlyingIsItself("AliasInt") // AliasIntのunderlying typeはAliasInt? -> true
+	underlyingIsItself("IntSlice") // IntSliceのunderlying typeはIntSlice? -> false
 }
+
+type MyInt int
+type MyMyInt MyInt
+type AliasInt = int
+type IntSlice []int
