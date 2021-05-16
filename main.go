@@ -42,6 +42,7 @@ func main() {
 		result := tp.Type() == tp.Type().Underlying()
 		fmt.Printf("%[1]sのunderlying typeは%[1]s? -> %t\n", typeName, result)
 	}
+	ast.Print(fset, file)
 	underlyingIsItself("MyInt")
 	underlyingIsItself("MyMyInt")
 	underlyingIsItself("AliasInt")
