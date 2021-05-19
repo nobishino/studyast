@@ -37,7 +37,7 @@ func main() {
 			log.Printf("type %q not found\n", typeName)
 			return
 		}
-		result := tp.Type() == tp.Type().Underlying()
+		result := types.Identical(tp.Type(), tp.Type().Underlying())
 		fmt.Printf("%[1]sのunderlying typeは%[1]s? -> %t\n", typeName, result)
 	}
 	underlyingIsItself("MyInt")    // MyIntのunderlying typeはMyInt? -> false
